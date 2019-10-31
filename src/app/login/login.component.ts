@@ -1,21 +1,31 @@
-import { Component } from '@angular/core';
+import { Component }               from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { AuthService }             from 'src/app/auth.service';
+import { HttpClient }              from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: [ './login.component.scss' ],
 })
 export class LoginComponent {
   loginForm = this.fb.group({
-    userName: [null, Validators.required],
-    password: [null, Validators.required],
+    username: [ null, Validators.required ],
+    password: [ null, Validators.required ],
   });
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+  ) {
+  }
 
   onSubmit() {
     console.log(this.loginForm.value);
-    alert('Thanks!');
+    this.auth
+      .login({ ...this.loginForm.value, subdomain: 'externaldemo' })
+      .subscribe(result => {
+        console.log('Auth', result);
+      });
   }
 }
