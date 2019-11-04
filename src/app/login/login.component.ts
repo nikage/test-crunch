@@ -1,7 +1,7 @@
 import { Component }               from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { AuthService }             from 'src/app/auth.service';
-import { HttpClient }              from '@angular/common/http';
+import { Router }                  from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -17,15 +17,15 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
+    private router: Router,
   ) {
   }
 
   onSubmit() {
-    console.log(this.loginForm.value);
     this.auth
       .login({ ...this.loginForm.value, subdomain: 'externaldemo' })
       .subscribe(result => {
-        console.log('Auth', result);
+        this.router.navigate([ 'dashboard' ]);
       });
   }
 }
