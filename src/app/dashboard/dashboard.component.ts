@@ -1,15 +1,15 @@
-import { Component }                       from '@angular/core';
-import { map }                             from 'rxjs/operators';
+import { Component, OnInit }               from '@angular/core';
+import { map, tap }                        from 'rxjs/operators';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
-import { HttpClient }                      from '@angular/common/http';
 import { SalesService }                    from 'src/app/services/sales.service';
+import { Observable }                      from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: [ './dashboard.component.scss' ],
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   /** Based on the screen size, switch from standard to one column per row */
   cards = this.breakpointObserver.observe(Breakpoints.Handset).pipe(
     map(({ matches }) => {
@@ -31,12 +31,24 @@ export class DashboardComponent {
     }),
   );
 
+  sales$: Observable<any>;
+  salesDetails$: Observable<any>;
+
+
   constructor(
     private breakpointObserver: BreakpointObserver,
-    private sales: SalesService) {
+    private salesService: SalesService) {
   }
 
   ngOnInit() {
-    this.sales.get()
+    this.sales$ = this.salesService.get();
+
+    this.salesDetails$ = this.salesService.getDetails()
+      .pipe(
+        tap(res => {
+          // TODO: debug only
+          console.log(res);
+        }),
+      );
   }
 }
