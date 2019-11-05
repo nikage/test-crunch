@@ -160,3 +160,14 @@ export interface SalesDetails {
 }
 
 
+export interface ISaleStats {
+  total: {
+    monetaryAmount: number;
+    numberOfSalesItems: number;
+    numberOfSales: number;
+  };
+  average: {
+    numberOfSalesItems: number;
+    monetaryAmountPerSale: number
+  };
+}

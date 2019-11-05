@@ -1,21 +1,11 @@
 import { Injectable }                 from '@angular/core';
-import { reduce, switchMap }          from 'rxjs/operators';
+import { reduce, switchMap, map }     from 'rxjs/operators';
 import { HttpClient }                 from '@angular/common/http';
 import { from as rxfrom, Observable } from 'rxjs';
-import { ISale }                      from 'src/app/interfaces/sales';
+import { ISale, ISaleStats }          from 'src/app/interfaces/sales';
 import { IApiResponse }               from 'src/app/interfaces/api-response';
 import { SalesDetailsData }           from 'src/app/interfaces/sales-details';
 
-interface ISaleStats {
-  total: {
-    monetaryAmount: number;
-    numberOfSalesItems: number;
-    numberOfSales: number;
-  };
-  average: {
-    numberOfSalesItems: number;
-  };
-}
 
 @Injectable({
   providedIn: 'root',
@@ -69,6 +59,7 @@ export class SalesService {
       },
       average: {
         numberOfSalesItems: 0,
+        monetaryAmountPerSale: 0,
       },
     };
     const sales = this.http
@@ -78,23 +69,26 @@ export class SalesService {
           return rxfrom(result.data);
         }),
         reduce<SalesDetailsData, ISaleStats>((acc: ISaleStats, el: SalesDetailsData): ISaleStats => {
-            return {
-              ...acc,
-              total: {
-                ...acc.total,
-                numberOfSales: acc.total.numberOfSales + 1,
-                numberOfSalesItems: acc.total.numberOfSalesItems + +el.sales_details.sales_items.length,
-                // TODO: make single request
-                monetaryAmount: acc.total.monetaryAmount + +el.sales_details.total_after_discount,
-              },
-              average: {
-                numberOfSalesItems: 0,
-              },
-            };
-          }, seed,
-        ),
+          return {
+            ...acc,
+            total: {
+              ...acc.total,
+              numberOfSales: acc.total.numberOfSales + 1,
+              numberOfSalesItems: acc.total.numberOfSalesItems + +el.sales_details.sales_items.length,
+              monetaryAmount: acc.total.monetaryAmount + +el.sales_details.total_after_discount,
+            }
+          };
+        }, seed),
+        map(({ total }): ISaleStats => {
+          return {
+            total,
+            average: {
+              numberOfSalesItems: total.numberOfSalesItems / total.numberOfSales,
+              monetaryAmountPerSale: total.monetaryAmount / total.numberOfSales,
+            },
+          };
+        }),
       );
     return sales;
   }
-
 }

@@ -3,6 +3,7 @@ import { map, tap }                        from 'rxjs/operators';
 import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 import { SalesService }                    from 'src/app/services/sales.service';
 import { Observable }                      from 'rxjs';
+import { ISaleStats }                      from 'src/app/interfaces/sales';
 
 @Component({
   selector: 'app-dashboard',
@@ -32,8 +33,9 @@ export class DashboardComponent implements OnInit {
   );
 
   sales$: Observable<any>;
-  salesDetails$: Observable<any>;
+  salesDetails$: Observable<ISaleStats>;
 
+  readonly NUMBER_FORMAT = '1.0-2';
 
   constructor(
     private breakpointObserver: BreakpointObserver,
