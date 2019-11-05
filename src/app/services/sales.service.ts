@@ -5,6 +5,7 @@ import { from as rxfrom, Observable } from 'rxjs';
 import { ISale, ISaleStats }          from 'src/app/interfaces/sales';
 import { IApiResponse }               from 'src/app/interfaces/api-response';
 import { SalesDetailsData }           from 'src/app/interfaces/sales-details';
+import { Moment }                     from 'moment';
 
 
 @Injectable({
@@ -17,39 +18,17 @@ export class SalesService {
   ) {
   }
 
-  get() {
-    const from = '2019-10-29 00:00:00';
+
+  getDetails(from?: Moment) {
+    const fromDefault = '2019-08-29 00:00:00';
     const to = '2019-11-01 00:00:00';
+    let fromParsed: string;
 
-    const sales = this.http
-      .get(`https://api.thegoodtill.com/api/external/get_sales?from=${ from }&to=${ to }`)
-      .pipe(
-        switchMap((result: IApiResponse): Observable<ISale[]> => {
-          return rxfrom(result.data);
-        }),
-        reduce<any>((acc, el: ISale): any => {
-          return {
-            ...acc,
-            total: {
-              sales: acc.totalSales + el.items.length,
-              salesItems: acc.totalSales + el.items.reduce((acc, item) => acc + item.quantity, 0),
-            },
-            average: {
-              monetaryAmount: 0,
-            },
+    if (from) {
+      fromParsed = from.format('YYYY-MM-DD 00:00:00');
+    }
 
-          };
-        }, {
-          totalSales: 0,
-          totalSaleItems: 0,
-        }),
-      );
-    return sales;
-  }
-
-  getDetails() {
-    const from = '2019-08-29 00:00:00';
-    const to = '2019-11-01 00:00:00';
+    const fromDate = fromParsed || fromDefault;
 
     const seed: ISaleStats = {
       total: {
@@ -62,8 +41,11 @@ export class SalesService {
         monetaryAmountPerSale: 0,
       },
     };
+
+
     const sales = this.http
-      .get(`https://api.thegoodtill.com/api/external/get_sales_details?from=${ from }&to=${ to }`)
+    // TODO: make url configurable
+      .get(`https://api.thegoodtill.com/api/external/get_sales_details?from=${ fromDate }&to=${ to }`)
       .pipe(
         switchMap((result: IApiResponse): Observable<SalesDetailsData> => {
           return rxfrom(result.data);
@@ -76,7 +58,7 @@ export class SalesService {
               numberOfSales: acc.total.numberOfSales + 1,
               numberOfSalesItems: acc.total.numberOfSalesItems + +el.sales_details.sales_items.length,
               monetaryAmount: acc.total.monetaryAmount + +el.sales_details.total_after_discount,
-            }
+            },
           };
         }, seed),
         map(({ total }): ISaleStats => {

@@ -4,6 +4,7 @@ import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 import { SalesService }                    from 'src/app/services/sales.service';
 import { Observable }                      from 'rxjs';
 import { ISaleStats }                      from 'src/app/interfaces/sales';
+import { Moment }                          from 'moment';
 
 @Component({
   selector: 'app-dashboard',
@@ -43,14 +44,10 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.sales$ = this.salesService.get();
+    this.salesDetails$ = this.salesService.getDetails();
+  }
 
-    this.salesDetails$ = this.salesService.getDetails()
-      .pipe(
-        tap(res => {
-          // TODO: debug only
-          console.log(res);
-        }),
-      );
+  dateChange(from: Moment) {
+    this.salesDetails$ = this.salesService.getDetails(from);
   }
 }

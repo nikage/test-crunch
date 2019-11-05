@@ -1,7 +1,8 @@
 <div class="grid-container">
   <h1 class="mat-h1">Dashboard</h1>
 
-  <app-datepicker></app-datepicker>
+  <app-datepicker (dateChange)="dateChange($event)"></app-datepicker>
+
   <mat-grid-list cols="2"
                  rowHeight="350px">
     <mat-grid-tile colspan="2"
@@ -10,44 +11,33 @@
         <mat-card-header>
           <mat-card-title>
             Sales Stats
-            <button mat-icon-button
-                    class="more-button"
-                    [matMenuTriggerFor]="menu"
-                    aria-label="Toggle menu">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #menu="matMenu"
-                      xPosition="before">
-              <button mat-menu-item>Expand</button>
-              <button mat-menu-item>Remove</button>
-            </mat-menu>
           </mat-card-title>
         </mat-card-header>
         <mat-card-content class="dashboard-card-content">
-          <div *ngIf="sales$ | async as sales">
-            For a given period, display:
-            <ul>
-              <div *ngIf="(salesDetails$ | async) as salesDetails">
-                <li>Total number of sales: {{ salesDetails.total.numberOfSales}} </li>
-                <li>Total number of sales items: {{ salesDetails.total.numberOfSalesItems }} </li>
-                <li>Total monetary amount: {{ salesDetails.total.monetaryAmount }}</li>
-                <li>Average number of sales items per
-                    sale: {{ salesDetails.average.numberOfSalesItems | number: NUMBER_FORMAT }} </li>
-                <li>Average monetary amount per
-                    sale: {{ salesDetails.average.monetaryAmountPerSale | number: NUMBER_FORMAT}}</li>
-              </div>
-            </ul>
-          </div>
+          <table *ngIf="(salesDetails$ | async) as salesDetails">
+            <tr>
+              <td>Total Number of Sales:</td>
+              <td>{{ salesDetails.total.numberOfSales}}</td>
+            </tr>
+            <tr>
+              <td>Total Number of Sales Items:</td>
+              <td>{{ salesDetails.total.numberOfSalesItems }}</td>
+            </tr>
+            <tr>
+              <td>Total Monetary Amount:</td>
+              <td>{{ salesDetails.total.monetaryAmount | number: NUMBER_FORMAT }}</td>
+            </tr>
+            <tr>
+              <td>Average Number of Sales Items per Sale:</td>
+              <td>{{ (salesDetails.average.numberOfSalesItems | number: NUMBER_FORMAT ) || 0}}</td>
+            </tr>
+            <tr>
+              <td>Average Monetary Amount per Sale:</td>
+              <td>{{ (salesDetails.average.monetaryAmountPerSale | number: NUMBER_FORMAT) || 0 }}</td>
+            </tr>
+          </table>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>
   </mat-grid-list>
-  <ul>
-  <li>○ Allow the user to select data from the following periods</li>
-  <li>This week (Monday 12am till now):</li>
-  <li>This month (12am Ist of the Month till now):</li>
-  <li>Last 7 days (since 12 am today):</li>
-  <li>Last 30 days(since 12 am today):</li>
-  </ul>
-
 </div>

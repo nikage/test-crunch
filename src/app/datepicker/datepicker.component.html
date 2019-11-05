@@ -1,17 +1,19 @@
 <mat-form-field>
-  <input (dateChange)="dateChange('change', $event )"
+  <input (dateChange)="datepickerChange()"
          matInput
          [matDatepicker]="picker"
          [(ngModel)]="selectedDate"
-         placeholder="Choose a date">
+         (ngModelChange)="emitDate($event)"
+         placeholder="Choose Date">
   <mat-datepicker-toggle matSuffix
                          [for]="picker"></mat-datepicker-toggle>
   <mat-datepicker #picker></mat-datepicker>
 </mat-form-field>
-
+or
 <mat-form-field>
-  <mat-label>Current period</mat-label>
-  <mat-select [value]="currentPeriod" (selectionChange)="dateRangeChange($event)">
+  <mat-label>Select Period</mat-label>
+  <mat-select [value]="currentPeriod"
+              (selectionChange)="dateSelectionRangeChange($event)">
     <mat-option value="thisWeek">This Week</mat-option>
     <mat-option value="thisMonth">This month</mat-option>
     <mat-option value="lastWeek">Last 7 Days</mat-option>

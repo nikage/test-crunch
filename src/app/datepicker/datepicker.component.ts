@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild }   from '@angular/core';
-import { MatSelectChange, MatDatepicker } from '@angular/material';
-import * as  moment                       from 'moment';
-import { Moment }                         from 'moment';
+import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { MatSelectChange, MatDatepicker }                     from '@angular/material';
+import * as  moment                                           from 'moment';
+import { Moment }                                             from 'moment';
 
 @Component({
   selector: 'app-datepicker',
@@ -13,18 +13,29 @@ export class DatepickerComponent implements OnInit {
   selectedDate: Date;
   currentPeriod: string;
 
+  @Output() dateChange: EventEmitter<Moment> = new EventEmitter();
+
+
   constructor() {
   }
 
   ngOnInit() {
   }
 
-  dateChange(type, e) {
+  datepickerChange() {
     this.currentPeriod = '';
-    console.log(e);
   }
 
-  dateRangeChange(e: MatSelectChange) {
+  emitDate(e: string) {
+    this.dateChange.emit(moment(new Date(e)));
+  }
+
+  private setDate(date: Moment) {
+    this.emitDate(date.toDate().toString());
+    this.selectedDate = date.toDate();
+  }
+
+  dateSelectionRangeChange(e: MatSelectChange) {
     const method = e.value;
     this[method]();
   }
@@ -48,11 +59,6 @@ export class DatepickerComponent implements OnInit {
   lastMonth() {
     const date = moment().subtract(30, 'd');
     this.setDate(date);
-
-  }
-
-  private setDate(date: Moment) {
-    this.selectedDate = date.toDate();
   }
 
 }
